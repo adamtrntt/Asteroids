@@ -40,6 +40,7 @@ class Player(CircleShape):
             velocity = forward * PLAYER_SHOOT_SPEED
             shot = Shot(self.position.x, self.position.y, SHOT_RADIUS)
             shot.velocity = velocity
+            shot.add(shot.containers)
             return shot
         return None
 
