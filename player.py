@@ -1,25 +1,23 @@
 import pygame
-from circleshape import *
-from constants import *
-from asteroid import *
+
+from asteroid import Shot
+from circleshape import CircleShape
+from constants import (
+    PLAYER_RADIUS,
+    PLAYER_SHOOT_COOLDOWN,
+    PLAYER_SHOOT_SPEED,
+    PLAYER_SPEED,
+    PLAYER_TURN_SPEED,
+    SHOT_RADIUS,
+)
+
 
 class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.timer = 0
-    
-    def shoot(self):
-        if self.timer <= 0:
-            self.timer = PLAYER_SHOOT_COOLDOWN
-            forward = pygame.Vector2(0, 1).rotate(self.rotation)
-            velocity = forward * PLAYER_SHOOT_SPEED
-            shot = Shot(self.position.x, self.position.y, SHOT_RADIUS)
-            shot.velocity = velocity
-            shot.add(Shot.containers)  # Add the shot to its containers
-            return shot
-        return None
-        
+
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -27,14 +25,14 @@ class Player(CircleShape):
         b = self.position - forward * self.radius - right
         c = self.position - forward * self.radius + right
         return [a, b, c]
-    
+
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
-    
+
     def move(self, direction, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.position += forward * direction * PLAYER_SPEED * dt 
-    
+        self.position += forward * direction * PLAYER_SPEED * dt
+
     def shoot(self):
         if self.timer <= 0:
             self.timer = PLAYER_SHOOT_COOLDOWN
@@ -42,13 +40,13 @@ class Player(CircleShape):
             velocity = forward * PLAYER_SHOOT_SPEED
             shot = Shot(self.position.x, self.position.y, SHOT_RADIUS)
             shot.velocity = velocity
+            shot.add(shot.containers)
             return shot
         return None
-    
 
     def update(self, dt):
         self.timer -= dt
-        
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
@@ -61,4 +59,3 @@ class Player(CircleShape):
             self.move(-1, dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
-        
